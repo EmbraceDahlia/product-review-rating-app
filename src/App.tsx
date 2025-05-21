@@ -1,8 +1,22 @@
-const App = () => {
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ProductPage from "./components/ProductPage";
+import ProductList from "./components/ProductList";
+import Layout from "./components/Layout";
+import { ProductProvider } from "./contexts/ProductContext";
+
+const App: React.FC = () => {
   return (
-    <div style={{textAlign:"center"}}>
-      <h1>Welcome to Product Review Rating App!</h1>
-    </div>
+    <Router>
+      <ProductProvider>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<ProductList />} />
+            <Route path="/products/:id" element={<ProductPage />} />
+          </Routes>
+        </Layout>
+      </ProductProvider>
+    </Router>
   );
 };
 
