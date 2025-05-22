@@ -1,5 +1,6 @@
 import React, { createContext, useState, useCallback } from 'react';
 import type { Product, Review } from '../types';
+import API_BASE_URL from '../config/api';
 
 interface ProductContextType {
   products: Product[];
@@ -34,9 +35,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(true);
       setError(null);
       try {
-        let url = `http://localhost:3003/products?page=${page}&limit=${limit}`;
+        let url = `${API_BASE_URL}/products?page=${page}&limit=${limit}`;
         if (category) url += `&category=${category}`;
-        if (searchQuery) url = `http://localhost:3003/products/search?q=${searchQuery}&page=${page}&limit=${limit}`;
+        if (searchQuery) url = `${API_BASE_URL}/products/search?q=${searchQuery}&page=${page}&limit=${limit}`;
         console.log(url);
         const response = await fetch(url);
         const data = await response.json();
@@ -54,7 +55,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchProductCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3003/products/categories`);
+      const response = await fetch(`${API_BASE_URL}/products/categories`);
       const data = await response.json();
       setCategories(data);
     } catch (err) {
@@ -73,11 +74,11 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setError(null);
 
     try {
-      const productResponse = await fetch(`http://localhost:3003/products/${id}`);
+      const productResponse = await fetch(`${API_BASE_URL}/products/${id}`);
       const productData = await productResponse.json();
       setProduct(productData);
 
-      const reviewsResponse = await fetch(`http://localhost:3003/products/${id}/reviews`);
+      const reviewsResponse = await fetch(`${API_BASE_URL}/products/${id}/reviews`);
       const reviewsData = await reviewsResponse.json();
       setReviews(reviewsData);
     } catch (err) {
@@ -89,7 +90,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addReview = async (review: Review) => {
     try {
-      const response = await fetch(`http://localhost:3003/products/${review.productId}/reviews`, {
+      const response = await fetch(`${API_BASE_URL}/products/${review.productId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateReview = async (reviewId: number, review: Review) => {
     try {
-      const response = await fetch(`http://localhost:3003/products/${product?.id}/reviews/${reviewId}`, {
+      const response = await fetch(`${API_BASE_URL}/products/${product?.id}/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteReview = async (reviewId: number) => {
     try {
-      await fetch(`http://localhost:3003/products/${product?.id}/reviews/${reviewId}`, {
+      await fetch(`${API_BASE_URL}/products/${product?.id}/reviews/${reviewId}`, {
         method: 'DELETE',
       });
       setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
