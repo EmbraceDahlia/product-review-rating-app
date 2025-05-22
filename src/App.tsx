@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import ProductPage from "./components/ProductPage";
+import ProductPage from "./components/Product";
 import ProductList from "./components/ProductList";
 import Layout from "./components/Layout";
 import { ProductProvider } from "./contexts/ProductContext";

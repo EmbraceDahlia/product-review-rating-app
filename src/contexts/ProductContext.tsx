@@ -35,10 +35,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(true);
       setError(null);
       try {
-        let url = `${API_BASE_URL}/products?page=${page}&limit=${limit}`;
-        if (category) url += `&category=${category}`;
+        let url = `${API_BASE_URL}/products?page=${page}&limit=${limit}`;        
         if (searchQuery) url = `${API_BASE_URL}/products/search?q=${searchQuery}&page=${page}&limit=${limit}`;
-        console.log(url);
+        if (category) url += `&category=${category}`;
         const response = await fetch(url);
         const data = await response.json();
         setProducts(data.products);

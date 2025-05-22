@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProduct } from '../contexts/ProductContext';
-import StarRating from '../components/StarRating';
+import StarRating from './StarRating';
 import type { Review } from '../types';
 
 const ProductPage: React.FC = () => {

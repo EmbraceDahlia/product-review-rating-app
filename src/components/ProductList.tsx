@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProduct } from '../contexts/ProductContext';
 import StarRating from './StarRating';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const PRODUCTS_PER_PAGE = 10;
 
@@ -27,6 +28,7 @@ const ProductList: React.FC = () => {
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCurrentPage(1);
+    setSearchQuery('');
     setSelectedCategory(e.target.value);
   };
 
@@ -42,6 +44,11 @@ const ProductList: React.FC = () => {
     }
   };
 
+  const handleSearchButtonClick = () => {
+    fetchProducts(1, PRODUCTS_PER_PAGE, selectedCategory, searchQuery);
+    setCurrentPage(1);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
@@ -52,17 +59,28 @@ const ProductList: React.FC = () => {
       </h1>
 
       <div className="row mb-3" style={{ flexShrink: 0 }}>
-        <div className="col-md-8 mb-3">
-          <input
-            type="search"
-            id="search"
-            className="form-control"
-            placeholder="Search by product name"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyDown={handleSearchSubmit}
-          />
-        </div>
+   <div className="col-md-8 mb-3 position-relative">
+    <input
+      type="search"
+      id="search"
+      className="form-control pe-5" 
+      placeholder="Search by product name"
+      value={searchQuery}
+      onChange={handleSearchChange}
+      onKeyDown={handleSearchSubmit}
+    />
+    
+    <button
+      type="button"
+      className="btn position-absolute end-0 top-50 translate-middle-y me-4 p-0 border-0 bg-transparent"
+      onClick={handleSearchButtonClick} 
+      aria-label="Search"
+      style={{ zIndex: 1 }}
+    >
+      <i className="bi bi-search"></i> 
+    </button>
+  </div>
+
 
         <div className="col-md-4">
           <div className="mb-3">
@@ -87,9 +105,9 @@ const ProductList: React.FC = () => {
         className="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-5"
         style={{
           flex: '1 1 auto',
-          overflowY: 'auto', 
-          marginBottom: '20px', 
-          height: 'calc(100vh - 100px)', 
+          overflowY: 'auto',
+          marginBottom: '20px',
+          height: 'calc(100vh - 100px)',
         }}
       >
         {products.map((product) => (
@@ -105,7 +123,6 @@ const ProductList: React.FC = () => {
                 <h6 className="card-title text-truncate">{product.name}</h6>
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
-
                     <StarRating rating={Number(product.averageRating) || 0} />
                   </div>
                   <div className="mt-2">
@@ -127,7 +144,7 @@ const ProductList: React.FC = () => {
           </div>
         ))}
       </div>
-      
+
       <div style={{ flexShrink: 0 }}>
         {totalPages > 1 && (
           <nav className="mt-4">
