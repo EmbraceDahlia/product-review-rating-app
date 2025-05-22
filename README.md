@@ -4,7 +4,7 @@ This is the frontend of the Product Review Rating App — a React + TypeScript S
 
 ## 🔗 Live Demo
 
-https://product-review-rating-app.vercel.app
+[https://product-review-rating-app.vercel.app](https://product-review-rating-app.vercel.app)
 
 ---
 
@@ -25,10 +25,16 @@ https://product-review-rating-app.vercel.app
 bash
 git clone https://github.com/EmbraceDahlia/product-review-rating-app.git
 cd product-review-rating-app
+
 ### Step 2. Install Dependencies
 bash
 npm install
-### Step 3. Run Development Server
+
+### Step 3: Setup Environment Variables
+Create a .env file in the root with the following:
+VITE_API_URL=backend_api_service_url
+
+### Step 4. Run Development Server
 bash
 npm run dev
 
@@ -43,6 +49,13 @@ View product details and associated reviews
 Add, edit, delete reviews
 Error and loading states
 Responsive design using Bootstrap
+
+---
+
+## 🧪 Future Enhancements
+Add user control
+
+---
 
 ## 📄 License
 This project is for educational/demo purposes.
