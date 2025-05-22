@@ -1,29 +1,63 @@
 import React from 'react';
+import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 
 interface StarRatingProps {
-    rating: number;
-    outOf?: number;
+  rating: number;
+  outOf?: number;
+  onRatingChange?: (rating: number) => void;
+  isReviewPage?: boolean;
+  style?: React.CSSProperties;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ rating, outOf = 5 }) => {
-    const safeOutOf = Math.max(1, Math.floor(outOf)); 
-    const safeRating = Math.max(0, Math.min(rating, safeOutOf));
+const StarRating: React.FC<StarRatingProps> = ({ rating, outOf = 5, onRatingChange, isReviewPage = false, style }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating - fullStars >= 0.5;
+  const emptyStars = outOf - fullStars - (hasHalfStar ? 1 : 0);
 
-    const fullStars = Math.floor(safeRating);
-    const hasHalfStar = safeRating - fullStars >= 0.5;
-    const emptyStars = safeOutOf - fullStars - (hasHalfStar ? 1 : 0);
+  const handleStarClick = (newRating: number) => {
+    if (onRatingChange) {
+      onRatingChange(newRating);
+    }
+  };
 
-    return (
-        <div style={{ color: '#ffc107', display: 'inline-flex' }}>
-            {Array.from({ length: fullStars }, (_, i) => (
-                <span key={`full-${i}`}>★</span>
-            ))}
-            {hasHalfStar && <span key="half">&#189;</span>}
-            {Array.from({ length: Math.max(0, emptyStars) }, (_, i) => (
-                <span key={`empty-${i}`}>☆</span> 
-            ))}
-        </div>
-    );
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', ...style }}>
+      {Array.from({ length: fullStars }, (_, i) => (
+        <FaStar
+          key={`full-${i}`}
+          style={{
+            color: 'darkred',
+            fontSize: isReviewPage ? '1.5rem':'1rem',
+            cursor: isReviewPage ? 'pointer' : 'default',
+          }}
+          onClick={() => isReviewPage && handleStarClick(i + 1)}
+        />
+      ))}
+
+      {hasHalfStar && (
+        <FaStarHalfAlt
+          style={{
+            color: 'darkred',
+            fontSize: isReviewPage ? '1.5rem':'1rem',
+            cursor: isReviewPage ? 'pointer' : 'default',
+          }}
+          onClick={() => isReviewPage && handleStarClick(fullStars + 0.5)}
+        />
+      )}
+      
+      {Array.from({ length: emptyStars }, (_, i) => (
+        <FaRegStar
+          key={`empty-${i}`}
+          style={{
+            color: 'darkred',
+            fontSize: isReviewPage ? '1.5rem':'1rem',
+            cursor: isReviewPage ? 'pointer' : 'default',
+          }}
+          onClick={() => isReviewPage && handleStarClick(fullStars + i + 1)}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default StarRating;

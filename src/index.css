@@ -28,7 +28,10 @@ body {
   /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(45deg, #f8d7da, #d1ecf1, #f0f0f0, #d4edda);
+  background-size: cover;
 }
+
 
 body > div{
   width: 100%;

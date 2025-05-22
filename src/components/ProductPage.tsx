@@ -6,15 +6,27 @@ import type { Review } from '../types';
 
 const ProductPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { product, reviews, loading, error: contextError, fetchProductAndReviews, addReview, deleteReview } = useProduct();
+    const {
+        product,
+        reviews,
+        loading,
+        error: contextError,
+        fetchProductAndReviews,
+        addReview,
+        updateReview,
+        deleteReview,
+    } = useProduct();
 
     const [newReview, setNewReview] = useState({
         author: '',
         rating: 0,
         comment: '',
     });
-    
+
+    const [selectedRating, setSelectedRating] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentReviewId, setCurrentReviewId] = useState<number | null>(null);
 
     useEffect(() => {
         if (id) {
@@ -22,13 +34,19 @@ const ProductPage: React.FC = () => {
         }
     }, [id, fetchProductAndReviews]);
 
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
         const { name, value } = e.target;
         setNewReview((prevState) => ({
             ...prevState,
             [name]: value,
         }));
+    };
+
+    const handleRatingClick = (rating: number) => {
+        setSelectedRating(rating);
+        setNewReview((prev) => ({ ...prev, rating }));
     };
 
     const handleSubmitReview = async (e: React.FormEvent) => {
@@ -45,16 +63,35 @@ const ProductPage: React.FC = () => {
             author: newReview.author,
             rating: newReview.rating,
             comment: newReview.comment,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
         };
 
-        await addReview(reviewData);
+        if (isEditing && currentReviewId !== null) {
+            await updateReview(currentReviewId, reviewData);
+        } else {
+            await addReview(reviewData);
+        }
+
         if (product?.id) {
             await fetchProductAndReviews(product.id);
         }
-        await
-            setNewReview({ author: '', rating: 0, comment: '' });
+
+        setNewReview({ author: '', rating: 0, comment: '' });
+        setSelectedRating(0);
         setError(null);
+        setIsEditing(false);
+        setCurrentReviewId(null);
+    };
+
+    const handleEditReview = (review: Review) => {
+        setIsEditing(true);
+        setCurrentReviewId(review.id);
+        setSelectedRating(review.rating);
+        setNewReview({
+            author: review.author,
+            rating: review.rating,
+            comment: review.comment,
+        });
     };
 
     const handleDeleteReview = async (reviewId: number) => {
@@ -64,31 +101,71 @@ const ProductPage: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="spinner-border" role="status"><span className="sr-only">Loading...</span></div>;
-    if (contextError) return <div className="alert alert-danger">{contextError}</div>;
+    if (loading) {
+        return (
+            <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+            </div>
+        );
+    }
+
+    if (contextError) {
+        return <div className="alert alert-danger">{contextError}</div>;
+    }
 
     return (
         <div className="container mt-5">
             <div className="row">
-                <div className="col-md-6">
-                    <img src={product?.imageUrl} alt={product?.name} className="img-fluid" />
+                <div className="col-md-4">
+                    <img
+                        src={product?.imagePath}
+                        alt={product?.name}
+                        className="img-fluid"
+                        style={{ width: '400px', height: 'auto' }}
+                    />
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-8">
                     <h1>{product?.name}</h1>
                     <p>{product?.description}</p>
-                    <p><strong>Price:</strong> ${product?.price}</p>
-                    <p><strong>Category:</strong> {product?.category}</p>
+                    <p>
+                        <strong>Price:</strong> ${product?.price}
+                    </p>
+                    <p>
+                        <strong>Category:</strong> {product?.category}
+                    </p>
                     <div>
-                        <strong>Rating:</strong> {product?.averageRating ? (Number(product.averageRating) || 0).toFixed(1) : 'Not Rated'} / 5
-                        {product && <StarRating rating={Number(product.averageRating) || 0} />}
+                        <strong>Rating:</strong>{' '}
+                        {product?.averageRating
+                            ? (Number(product.averageRating) || 0).toFixed(1)
+                            : 'Not Rated'}{' '}
+                        / 5&nbsp;
+                        {product && (
+                            <StarRating rating={Number(product.averageRating) || 0} />
+                        )}
                     </div>
                 </div>
             </div>
 
-            <h2 className="mt-5">Add a Review</h2>
+            <h2 className="mt-5">{isEditing ? 'Edit Review' : 'Add a Review'}</h2>
             <form onSubmit={handleSubmitReview}>
                 <div className="mb-3">
-                    <label htmlFor="author" className="form-label">Author</label>
+                    <label htmlFor="rating" className="form-label">
+                        Rating
+                    </label>
+                    <div id="rating" className="d-flex">
+                        <StarRating
+                            rating={selectedRating}
+                            outOf={5}
+                            isReviewPage={true}
+                            onRatingChange={handleRatingClick}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="author" className="form-label">
+                        Author
+                    </label>
                     <input
                         type="text"
                         className="form-control"
@@ -100,24 +177,9 @@ const ProductPage: React.FC = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="rating" className="form-label">Rating</label>
-                    <select
-                        className="form-select"
-                        id="rating"
-                        name="rating"
-                        value={newReview.rating}
-                        onChange={handleInputChange}
-                    >
-                        <option value="0">Select a rating</option>
-                        {[1, 2, 3, 4, 5].map((rating) => (
-                            <option key={rating} value={rating}>
-                                {rating} Star{rating > 1 ? 's' : ''}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="comment" className="form-label">Comment</label>
+                    <label htmlFor="comment" className="form-label">
+                        Comment
+                    </label>
                     <textarea
                         className="form-control"
                         id="comment"
@@ -130,9 +192,24 @@ const ProductPage: React.FC = () => {
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
-                <button type="submit" className="btn btn-primary">
-                    Submit Review
+                <button type="submit" className="btn btn-primary me-2">
+                    {isEditing ? 'Update Review' : 'Submit Review'}
                 </button>
+
+                {isEditing && (
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => {
+                            setIsEditing(false);
+                            setCurrentReviewId(null);
+                            setNewReview({ author: '', rating: 0, comment: '' });
+                            setSelectedRating(0);
+                        }}
+                    >
+                        Cancel
+                    </button>
+                )}
             </form>
 
             <h2 className="mt-5">Reviews</h2>
@@ -147,14 +224,19 @@ const ProductPage: React.FC = () => {
                             <div className="card-text">
                                 <small className="text-muted">
                                     Rating: {review.rating} / 5
-                                    <div style={{ display: 'inline-block' }}>
+                                    <div style={{ display: 'inline-block', marginLeft: '10px' }}>
                                         <StarRating rating={review.rating} />
                                     </div>
                                 </small>
                             </div>
-
                             <button
-                                className="btn btn-danger"
+                                className="btn btn-warning me-2 mt-2"
+                                onClick={() => handleEditReview(review)}
+                            >
+                                Edit Review
+                            </button>
+                            <button
+                                className="btn btn-danger mt-2"
                                 onClick={() => handleDeleteReview(review.id)}
                             >
                                 Delete Review
