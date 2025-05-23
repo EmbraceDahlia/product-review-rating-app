@@ -23,12 +23,12 @@ This is the frontend of the Product Review Rating App — a React + TypeScript S
 
 ### Step 1. Clone the Repository
 bash
-git clone https://github.com/EmbraceDahlia/product-review-rating-app.git
-cd product-review-rating-app
+- git clone https://github.com/EmbraceDahlia/product-review-rating-app.git
+- cd product-review-rating-app
 
 ### Step 2. Install Dependencies
 bash
-npm install
+- npm install
 
 ### Step 3: Setup Environment Variables
 Create a .env file in the root with the following:
@@ -36,19 +36,19 @@ VITE_API_URL=backend_api_service_url
 
 ### Step 4. Run Development Server
 bash
-npm run dev
+- npm run dev
 
 ---
 
 ## ✅ Features
 
-Paginated product listing
-Search products by name
-Filter by category
-View product details and associated reviews
-Add, edit, delete reviews
-Error and loading states
-Responsive design using Bootstrap
+- Paginated product listing
+- Search products by name
+- Filter by category
+- View product details and associated reviews
+- Add, edit, delete reviews
+- Error and loading states
+- Responsive design using Bootstrap
 
 ---
 
